@@ -102,6 +102,7 @@ public class SpeechToTextPlugin :
     private var debugLogging: Boolean = false
     private var alwaysUseStop: Boolean = false
     private var intentLookup: Boolean = false
+    private var forceSpeechServicesByGoogle: Boolean = false
     private var noBluetoothOpt: Boolean = false // user-defined option
     private var bluetoothDisabled = true // final bluetooth state (combines user-defined option and permissions)
     private var resultSent: Boolean = false
@@ -193,6 +194,10 @@ public class SpeechToTextPlugin :
                     var iOpt = call.argument<Boolean>("intentLookup")
                     if (null != iOpt) {
                         intentLookup = iOpt == true
+                    }
+                    var fssbgOpt = call.argument<Boolean>("forceSpeechServicesByGoogle")
+                    if (null != fssbgOpt) {
+                        forceSpeechServicesByGoogle = fssbgOpt == true
                     }
                     var noBtOpt = call.argument<Boolean>("noBluetooth")
                     if (null != noBtOpt) {
@@ -560,7 +565,19 @@ public class SpeechToTextPlugin :
         handler.post {
             run {
                 debugLog("Creating recognizer")
-                if (intentLookup) {
+                if (forceSpeechServicesByGoogle){
+                    speechRecognizer = createSpeechRecognizer(
+                        pluginContext,
+                        ComponentName(
+                            "com.google.android.tts",
+                            "com.google.android.apps.speech.tts.googletts.service.GoogleTTSRecognitionService"
+                        )
+                    ).apply {
+                        debugLog("Setting listener after forcing Speech Services By Google")
+                        setRecognitionListener(this@SpeechToTextPlugin)
+                    }
+                }
+                else if (intentLookup) {
                     speechRecognizer = createSpeechRecognizer(
                         pluginContext,
                         pluginContext?.findComponentName()

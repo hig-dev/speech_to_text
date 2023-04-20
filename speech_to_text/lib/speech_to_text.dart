@@ -123,6 +123,14 @@ class SpeechToText {
   static final SpeechConfigOption androidIntentLookup =
       SpeechConfigOption('android', 'intentLookup', true);
 
+  /// Some Android 12/13 builds use an incompatible speech recognition engine
+  /// of the "Android System Intelligence" package by default.
+  /// More info about this bug: https://stackoverflow.com/a/70100950
+  /// This option forces to use the speech recognition engine of
+  /// "Speech Services by Google". This overrides the androidIntentLookup option.
+  static final SpeechConfigOption androidForceSpeechServicesByGoogle =
+      SpeechConfigOption('android', 'forceSpeechServicesByGoogle', true);
+
   /// If your application does not need Bluetooth support on Android and
   /// you'd rather not have to ask for Bluetooth permission pass this option
   /// to disable Bluetooth support on Android.
